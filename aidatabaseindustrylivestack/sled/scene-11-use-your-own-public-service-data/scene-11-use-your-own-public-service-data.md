@@ -2,63 +2,61 @@
 
 ## Introduction
 
-**Use Your Own Public Service Data** shows how users can replace or restore the dataset through the application while keeping the demo safe and repeatable.
+**Use Your Own Public Service Data** shows how teams can adapt the **LiveStack** pattern to their own resident-service data while preserving the seeded **Colorado** baseline as a repeatable demo state.
 
-The workflow supports template download, ZIP validation, upload, seeded-data restore, and the expectation that only synthetic or anonymized public-sector data is used.
-
-This scene matters because a State and Local Government LiveStack is most useful when teams can map the demo pattern to their own terminology and sample data. The application makes that workflow explicit while keeping the seeded Seer public-sector data available as a known-good baseline.
+Dataset status, validation, upload, restore preview, restore, and job status require a Global VPD Admin. Use only synthetic, anonymized, or approved de-identified data. Never upload resident production data, credentials, wallets, or other secrets to this demo environment.
 
 Estimated Time: **10 minutes**
 
-![Use Your Own Public Service Data modal with template, upload, validation, and restore controls](images/scene-11-use-your-own-public-service-data.png)
+![Use Your Own Public Service Data with validation and restore controls](images/scene-11-use-your-own-public-service-data.png)
 
 ### Objectives
 
-In this scene, you will learn how to open the dataset manager, review the template and upload workflow, and restore the seeded demo data when needed.
+In this scene, you will review template download, completed ZIP upload, validation, restore preview, and seeded-data restore controls while reinforcing safe data-handling expectations.
 
 ## Task 1: Open the dataset tool
 
-Perform the following set of steps to show where users can manage datasets and to reinforce the key safety rule: use only synthetic or anonymized public-sector data.
+Perform the following set of steps to open the dataset tool as the global administrator:
 
-1. From any application scene, click **Use Your Own Public Service Data** in the top bar.
-2. Review the modal title and active dataset line.
-3. Confirm that the modal explains the guided path for loading data or continuing with the current demo dataset.
-4. Review the main sections for template download, completed ZIP selection, validation, upload, and restore demo data.
+1. Confirm Jessica Chen is selected.
+2. From any application scene, click **Use Your Own Public Service Data**.
+3. Confirm **Demo Data** is the active dataset.
+4. Review the global-access and safe-data guidance.
 
-    ![Use Your Own Public Service Data top-bar control and modal](images/open-dataset-tool.png)
+    ![Dataset tool opened with the active Colorado demo baseline](images/open-dataset-tool.png)
 
-In the current demo, the modal shows the active dataset as **Demo Data** and provides a workflow for a ZIP package containing a manifest and table CSV files.
+The global requirement prevents a regional or restricted identity from replacing the shared demonstration dataset.
 
-**Note:** Use only synthetic or anonymized public-sector data in a demo environment.
+## Task 2: Review the template and validation workflow
 
-## Task 2: Review the template and upload workflow
+Perform the following set of steps to review the template and validation workflow for customer-provided public-service data:
 
-Perform the following set of steps to show how custom datasets stay repeatable. The template defines the expected structure, validation checks the completed ZIP, and upload remains a deliberate action.
+1. Click **Download Template ZIP**. The canonical template filename is `sled-service-operations-import-template-v1.zip`.
+2. Explain that the archive contains `manifest.json` plus required and optional CSV templates.
+3. Review **Select Completed ZIP** and choose a completed package only when conducting an intentional data test.
+4. Review **Validate Upload** and **Upload Data**.
+5. Explain that validation must succeed before replacement and that upload validates again on the server.
 
-1. Click **Download Template ZIP** to download the canonical schema package.
-2. Review **Select Completed ZIP**. The control expects a `.zip` containing a manifest and table CSV files.
-3. Review the **Validate Upload** and **Upload Data** actions.
-4. Explain that validation should run before data replacement.
+    ![Template download completed ZIP validation and upload workflow](images/template-and-upload-workflow.png)
 
-    ![Dataset template download, ZIP selection, validate, and upload controls](images/template-and-upload-workflow.png)
+The template and validation steps make custom demonstrations repeatable while keeping the seeded Colorado scenario available as a known baseline.
 
-This workflow keeps custom demos repeatable and safe: the template defines the structure, validation checks the package, upload is explicit, and seeded data remains available for reset.
+## Task 3: Preview the seeded-data restore
 
-## Task 3: Preview or restore the seeded dataset
+Perform the following set of steps to preview the seeded-data restore without disrupting a shared workshop environment:
 
-Perform the following set of steps to return the demo to a known-good baseline after testing custom synthetic or anonymized data.
+1. Click **Preview Restore**.
+2. Review expected row counts, validation messages, and warnings.
+3. Do not click **Restore Demo Data** during the normal walkthrough.
+4. If an intentional upload or restore is performed later, show the Job ID, progress, terminal state, and the refreshed operational pages.
 
-1. In the restore section, click **Preview Restore**.
-2. Review the validation status shown by the preview.
-3. If you need to return the demo to the seeded baseline, click **Restore Demo Data** after the successful preview.
-4. Close the dataset manager when finished.
+    ![Preview Restore results for the seeded Colorado demo data](images/preview-restore-seeded-dataset.png)
 
-    ![Preview Restore, restore demo data, and validation result](images/preview-restore-seeded-dataset.png)
+The preview makes the reset impact visible before any replacement begins. **Restore Demo Data** should be used only when the operator intentionally wants to return the environment to its known seeded state.
 
-Use this scene to explain the operating guardrail: teams can bring synthetic or anonymized data into the LiveStack, but the seeded dataset remains available as a known baseline.
-
-You can move to the download lab when you want to run the State and Local Government LiveStack locally.
+You can move to the Take It Home lab when you want to run the State and Local Government LiveStack locally.
 
 ## Credits & Build Notes
+
 - **Author** - Oracle LiveLabs Team
-- **Last Updated By/Date** - Oracle LiveLabs Team, 2026-06-17
+- **Last Updated By/Date** - Oracle LiveLabs Team, 2026-07-03
