@@ -93,9 +93,11 @@ Perform the following set of steps to execute the transformation:
 
 4. Open **Jobs** in the project resources.
 
-![2026-08-17-004689](images/2026-08-17-004689.png) 
+![2026-08-17-004689](images/2026-08-17-004688.png) 
 
 5. Confirm that the `dataFlow` job finishes successfully.
+
+![2026-08-17-004690](images/2026-08-17-004689.png)
 
 The target uses an append integration pattern. For a clean, repeatable demonstration, run the flow once in a freshly provisioned environment. Do not repeatedly start the flow merely to refresh the same result, because each successful execution can add another set of target rows.
 
