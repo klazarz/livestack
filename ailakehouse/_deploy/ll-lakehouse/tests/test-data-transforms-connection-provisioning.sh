@@ -219,9 +219,10 @@ with open(sys.argv[1], encoding="utf-8") as handle:
 
 properties = payload["connectionProperties"]["dataServerProperties"]
 assert properties["restUri"] == "http://catalog.example.invalid:1525/iceberg"
-assert properties["s3Region"] == ""
-assert properties["s3AccessID"] is None
-assert properties["s3SecretKey"] is None
+assert properties["s3Region"] == "eu-frankfurt-1"
+assert properties["s3AccessID"] == "example-access-id"
+assert properties["s3SecretKey"] == "example-secret-key"
+assert properties["enableCredentialVending"] == "true"
 assert properties["azureAccountKey"] is None
 assert properties["azureClientId"] is None
 assert properties["azureClientSecret"] is None
