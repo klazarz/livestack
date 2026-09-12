@@ -239,13 +239,37 @@ require_text "ingestion/compose.yml" '"${POSTGRES_SOURCE_PORT:-8504}:5432"'
 require_text "ingestion/compose.yml" "hostname: loyalty-mysql"
 require_text "ingestion/compose.yml" '"${LOYALTY_MYSQL_PORT:-8503}:3306"'
 require_text "ingestion/compose.yml" "hostname: mongodb-catalog"
-require_text "ingestion/compose.yml" '"${MONGODB_CATALOG_PORT:-27017}:27017"'
+require_text "ingestion/compose.yml" '"${MONGODB_CATALOG_PORT:-8888}:27017"'
+require_text "ingestion/compose.source-tls.yml" "ssl=on"
+require_text "ingestion/compose.source-tls.yml" "--tlsMode"
 require_text "init/setenv.sh" 'POSTGRES_SOURCE_PORT=${POSTGRES_SOURCE_PORT:-8504}'
+require_text "init/setenv.sh" 'POSTGRES_CATALOG_PORT=${POSTGRES_CATALOG_PORT:-5432}'
 require_text "init/setenv.sh" 'LOYALTY_MYSQL_PORT=${LOYALTY_MYSQL_PORT:-8503}'
-require_text "init/setenv.sh" 'MONGODB_CATALOG_PORT=${MONGODB_CATALOG_PORT:-27017}'
-require_text "init/setenv.sh" 'SOURCE_PUBLIC_HOST=${SOURCE_PUBLIC_HOST:-${PUBLIC_IP}}'
-require_text "ingestion/frontend/src/pages/DataSources.jsx" "Data Sources"
-require_text "ingestion/backend/routes/dataSources.js" 'postgresql://${host}'
+require_text "init/setenv.sh" 'LOYALTY_MYSQL_CATALOG_PORT=${LOYALTY_MYSQL_CATALOG_PORT:-3306}'
+require_text "init/setenv.sh" 'MONGODB_CATALOG_PORT=${MONGODB_CATALOG_PORT:-8888}'
+require_text "init/setenv.sh" 'MONGODB_CATALOG_LINK_PORT=${MONGODB_CATALOG_LINK_PORT:-27017}'
+require_text "init/setenv.sh" 'SOURCE_PUBLIC_HOST=${SOURCE_PUBLIC_HOST:-${PUBLIC_ENDPOINT_HOST}}'
+require_text "init/setenv.sh" 'FRONTEND_URL=${FRONTEND_URL:-https://${PUBLIC_ENDPOINT_HOST}:8505}'
+require_text "init/setenv.sh" 'PUBLIC_HOST=${PUBLIC_ENDPOINT_HOST}'
+require_text "init/setenv.sh" 'GGSA_PUBLIC_HOST=${GGSA_PUBLIC_HOST:-${PUBLIC_ENDPOINT_HOST}}'
+reject_text "init/adb-load.sh" 'DBMS_CLOUD_ADMIN.CREATE_DATABASE_LINK('
+reject_text "init/adb-load.sh" 'DBMS_CATALOG.MOUNT_DB_LINK('
+require_text "ingestion/backend/routes/sourceCatalogs.js" 'DBMS_CLOUD_ADMIN.CREATE_DATABASE_LINK('
+require_text "ingestion/backend/routes/sourceCatalogs.js" 'DBMS_CATALOG.MOUNT_DB_LINK('
+require_text "ingestion/backend/routes/sourceCatalogs.js" "port('LOYALTY_MYSQL_CATALOG_PORT', 3306)"
+require_text "ingestion/backend/routes/sourceCatalogs.js" 'PG_LOYALTY_MYSQL_CAT'
+reject_text "ingestion/backend/routes/sourceCatalogs.js" 'PG_SPORTSWEAR_CAT'
+reject_text "ingestion/backend/routes/sourceCatalogs.js" 'PG_MONGODB_CATALOG_CAT'
+reject_text "ingestion/backend/routes/sourceCatalogs.js" 'PG_NETSUITE_CAT'
+require_text "ingestion/db/data/create_user_pg.sql" 'GRANT EXECUTE ON DBMS_CLOUD TO "PG";'
+require_text "ingestion/db/data/create_user_pg.sql" 'GRANT EXECUTE ON DBMS_CLOUD_ADMIN TO "PG";'
+require_text "ingestion/db/data/create_user_pg.sql" 'GRANT CREATE DATABASE LINK TO "PG";'
+require_text "ingestion/frontend/src/pages/DataSources.jsx" "Data Catalog"
+require_text "ingestion/frontend/src/pages/DataSources.jsx" "Open Data Studio"
+require_text "ingestion/backend/routes/dataSources.js" 'mysql://${host}'
+reject_text "ingestion/backend/routes/dataSources.js" 'postgresql://${host}'
+reject_text "ingestion/backend/routes/dataSources.js" 'mongodb://${host}'
+reject_text "ingestion/backend/routes/dataSources.js" 'oracle://${host}'
 require_text "ingestion/backend/routes/awsGlue.js" "DBMS_CATALOG.MOUNT_DATA_CATALOG"
 require_text "ingestion/backend/routes/awsGlue.js" "data_catalog_type       => 'AWS_GLUE'"
 require_text "ingestion/backend/lib/customerCdcSetup.js" 'const STUDIO_TOKEN_CACHE_TTL_MS = 50 * 60 * 1000'
@@ -266,6 +290,7 @@ if [[ "${RUN_BUILD}" -eq 1 ]]; then
   unzip -q "${ZIP_PATH}" -d "${tmp_dir}"
   bash "${tmp_dir}/tests/test-custom-image-preparation.sh"
   bash "${tmp_dir}/tests/test-source-database-compose.sh"
+  bash "${tmp_dir}/tests/test-public-endpoint-urls.sh"
   bash "${tmp_dir}/tests/test-aws-glue-catalog.sh"
   bash "${tmp_dir}/tests/test-data-transforms-connection-provisioning.sh"
   bash "${tmp_dir}/tests/test-wallet-hardening.sh"

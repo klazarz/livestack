@@ -21,6 +21,7 @@ COMPOSE_FILE="${COMPOSE_FILE:-${INGESTION_DIR}/compose.yml}"
 HOME_OCI_DIR="${HOME_OCI_DIR:-${OPC_HOME}/.oci}"
 INGESTION_OCI_DIR="${INGESTION_OCI_DIR:-${INGESTION_DIR}/.oci}"
 GOLDENGATE_CERT_DIR="${GOLDENGATE_CERT_DIR:-${INGESTION_DIR}/cdc/goldengate/cert}"
+SOURCE_TLS_DIR="${SOURCE_TLS_DIR:-${INGESTION_DIR}/source-tls}"
 APPLICATION_LOG_DIR="${APPLICATION_LOG_DIR:-${INGESTION_DIR}/logs}"
 INSTALL_LOG="${INSTALL_LOG:-${OPC_HOME}/inst.log}"
 PODMAN_AUTH_FILE="${PODMAN_AUTH_FILE:-${OPC_HOME}/.config/containers/auth.json}"
@@ -552,6 +553,7 @@ remove_runtime_credentials() {
   remove_sensitive_directory "${HOME_OCI_DIR}" "home OCI credential"
   remove_sensitive_directory "${INGESTION_OCI_DIR}" "ingestion OCI credential"
   remove_sensitive_directory "${GOLDENGATE_CERT_DIR}" "generated GoldenGate TLS credential"
+  remove_sensitive_directory "${SOURCE_TLS_DIR}" "source database TLS credential"
   remove_sensitive_directory "${APPLICATION_LOG_DIR}" "application log"
 }
 

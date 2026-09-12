@@ -96,18 +96,15 @@ sudo dnf update -y
 progress 2 "Configuring firewall"
 sudo firewall-cmd --permanent --add-port=1521/tcp #Database
 sudo firewall-cmd --permanent --add-port=1522/tcp #NetSuite source database
-sudo firewall-cmd --permanent --add-port=8888/tcp #JupyterLabs
 sudo firewall-cmd --permanent --add-port=8181/tcp #ORDS
 sudo firewall-cmd --permanent --add-port=1525/tcp #Gravitino Iceberg REST API
 sudo firewall-cmd --permanent --add-port=8501/tcp #GoldenGate CDC HTTP
 sudo firewall-cmd --permanent --add-port=8502/tcp #GoldenGate CDC HTTPS
 sudo firewall-cmd --permanent --add-port=8503/tcp #Streamlit
-sudo firewall-cmd --permanent --add-port=8504/tcp #Streamlit
 sudo firewall-cmd --permanent --add-port=8505/tcp #Streamlit
 sudo firewall-cmd --permanent --add-port=5500/tcp #EM
 sudo firewall-cmd --permanent --add-port=5501/tcp #EM
 sudo firewall-cmd --permanent --add-port=7000/tcp #Django
-sudo firewall-cmd --permanent --add-port=27017/tcp #Mongo
 sudo firewall-cmd --permanent --add-port=8085/tcp #GGSA OSA HTTPS
 sudo firewall-cmd --permanent --add-port=8086/tcp #Sprin2
 sudo firewall-cmd --permanent --add-port=8087/tcp #Sprin3
