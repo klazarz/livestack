@@ -105,7 +105,9 @@ require_entry "ingestion/iceberg-seeder/Dockerfile"
 require_entry "ingestion/iceberg-seeder/seed_product_master.py"
 require_entry "init/create-pg-iceberg-connection.sh"
 require_entry "init/create-iceberg-adb-external-table.sh"
+require_entry "init/configure-ai-data-catalog.sh"
 require_entry "init/adb-wallet.sh"
+require_entry "init/pg-ai-data-catalog.service"
 require_entry "init/pg-iceberg-connection.service"
 require_entry "init/iceberg-seed.service"
 require_entry "prepare-custom-image.sh"
@@ -113,6 +115,7 @@ require_entry "scripts/build-rc-zip.sh"
 require_entry "scripts/verify-rc-zip.sh"
 require_entry "tests/test-custom-image-preparation.sh"
 require_entry "tests/test-source-database-compose.sh"
+require_entry "tests/test-ai-data-catalog.sh"
 require_entry "tests/test-aws-glue-catalog.sh"
 require_entry "tests/test-data-transforms-connection-provisioning.sh"
 require_entry "tests/test-wallet-hardening.sh"
@@ -151,12 +154,16 @@ require_text "ingestion/compose.yml" 'ICEBERG_SEED_FILE_IO: ${ICEBERG_SEED_FILE_
 require_text "ingestion/compose.yml" 'ICEBERG_SEED_ADB_METADATA: ${ICEBERG_SEED_ADB_METADATA:-true}'
 require_text "inst.sh" "pg-iceberg-connection.service"
 require_text "inst.sh" "iceberg-seed.service"
+require_text "inst.sh" "pg-ai-data-catalog.service"
+require_text "inst.sh" "configure-ai-data-catalog.sh"
 require_text "inst.sh" "create-iceberg-adb-external-table.sh"
 require_text "inst.sh" "/usr/local/bin/podman-compose -f compose.yml --profile seed build iceberg-seeder"
 require_text "inst.sh" "sudo pip3.11 install oracledb dotenv requests"
 require_text "inst.sh" "OCI metadata key build_archive_url"
 reject_text "inst.sh" 'BUILD_ARCHIVE_URL="https://'
 require_text "prepare-custom-image.sh" "Cleared generated wallet state"
+require_text "prepare-custom-image.sh" ".ai_data_catalog_done"
+require_text "prepare-custom-image.sh" ".ai_data_catalog_storage_registered"
 require_text "prepare-custom-image.sh" "remove_configured_wallet_archive"
 require_text "prepare-custom-image.sh" "remove_home_wallet_archives"
 require_text "prepare-custom-image.sh" ".oci_wallet_required"
@@ -188,6 +195,8 @@ reject_text "inst.sh" '--password "${CON_TOK}"'
 reject_text "inst.sh" '-p "${CON_TOK}"'
 require_text "init/variable.sh" 'export_metadata_or_default "GRAVITINO_REST_PORT" "gravitino_rest_port" "1525"'
 require_text "init/variable.sh" 'export_metadata_or_default "DATA_TRANSFORMS_ADB_AUTO_CONFIGURE"'
+require_text "init/variable.sh" 'export_metadata_or_default "AI_DATA_CATALOG_ENABLED"'
+require_text "init/variable.sh" 'export_metadata_or_default "AI_DATA_CATALOG_WAREHOUSE"'
 require_text "init/variable.sh" 'export_metadata_or_default "DATA_TRANSFORMS_ADB_USERNAME"'
 require_text "init/variable.sh" 'export_metadata_or_default "ICEBERG_SEED_NAMESPACE" "iceberg_seed_namespace"'
 require_text "init/variable.sh" 'export_metadata_or_default "ICEBERG_ADB_EXTERNAL_TABLE" "iceberg_adb_external_table"'
@@ -196,6 +205,12 @@ require_text "init/setenv.sh" 'echo "GRAVITINO_JDBC_SERVICE_NAME=${DBNAME}_high"
 require_text "init/setenv.sh" 'echo "GRAVITINO_WAREHOUSE=s3a://${BUCKET_NAME}/${GRAVITINO_OBJECT_STORAGE_PREFIX:-iceberg}"'
 require_text "init/setenv.sh" 'echo "DATA_TRANSFORMS_ADB_CONNECTION_NAME=${DATA_TRANSFORMS_ADB_CONNECTION_NAME:-${DBNAME:-}}"'
 require_text "init/setenv.sh" 'echo "DATA_TRANSFORMS_ADB_USERNAME=${DATA_TRANSFORMS_ADB_USERNAME:-PG}"'
+require_text "init/setenv.sh" 'echo "AI_DATA_CATALOG_ENABLED=${AI_DATA_CATALOG_ENABLED:-false}"'
+require_text "init/setenv.sh" 'echo "AI_DATA_CATALOG_WAREHOUSE=${AI_DATA_CATALOG_WAREHOUSE:-}"'
+require_text "init/configure-ai-data-catalog.sh" "DBMS_CATALOG.MOUNT_ICEBERG"
+require_text "init/configure-ai-data-catalog.sh" "ORACLE_AI_DATA_CATALOG.REGISTER_STORAGE_OCI"
+require_text "init/configure-ai-data-catalog.sh" "AI Data Catalog storage registration marker exists"
+require_text "init/pg-ai-data-catalog.service" "Before=user-podman.service"
 require_text "init/pg-iceberg-connection.service" "After=network-online.target adb-wallet.service adb-load.service user-podman.service"
 require_text "init/iceberg-seed.service" "--profile seed"
 require_text "init/iceberg-seed.service" "--profile seed run --rm iceberg-seeder"
