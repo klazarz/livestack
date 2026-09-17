@@ -198,6 +198,7 @@ require_text "init/variable.sh" 'export_metadata_or_default "DATA_TRANSFORMS_ADB
 require_text "init/variable.sh" 'export_metadata_or_default "AI_DATA_CATALOG_ENABLED"'
 require_text "init/variable.sh" 'export_metadata_or_default "AI_DATA_CATALOG_WAREHOUSE"'
 require_text "init/variable.sh" 'export_metadata_or_default "DATA_TRANSFORMS_ADB_USERNAME"'
+require_text "init/variable.sh" 'export_metadata_or_default "DATA_TRANSFORMS_AICAT_CONNECTION_NAME"'
 require_text "init/variable.sh" 'export_metadata_or_default "ICEBERG_SEED_NAMESPACE" "iceberg_seed_namespace"'
 require_text "init/variable.sh" 'export_metadata_or_default "ICEBERG_ADB_EXTERNAL_TABLE" "iceberg_adb_external_table"'
 require_text "init/setenv.sh" 'echo "GRAVITINO_JDBC_PASSWORD=${DBPASSWORD}"'
@@ -205,6 +206,7 @@ require_text "init/setenv.sh" 'echo "GRAVITINO_JDBC_SERVICE_NAME=${DBNAME}_high"
 require_text "init/setenv.sh" 'echo "GRAVITINO_WAREHOUSE=s3a://${BUCKET_NAME}/${GRAVITINO_OBJECT_STORAGE_PREFIX:-iceberg}"'
 require_text "init/setenv.sh" 'echo "DATA_TRANSFORMS_ADB_CONNECTION_NAME=${DATA_TRANSFORMS_ADB_CONNECTION_NAME:-${DBNAME:-}}"'
 require_text "init/setenv.sh" 'echo "DATA_TRANSFORMS_ADB_USERNAME=${DATA_TRANSFORMS_ADB_USERNAME:-PG}"'
+require_text "init/setenv.sh" 'echo "DATA_TRANSFORMS_AICAT_CONNECTION_NAME=${DATA_TRANSFORMS_AICAT_CONNECTION_NAME:-pg-aicat}"'
 require_text "init/setenv.sh" 'echo "AI_DATA_CATALOG_ENABLED=${AI_DATA_CATALOG_ENABLED:-false}"'
 require_text "init/setenv.sh" 'echo "AI_DATA_CATALOG_WAREHOUSE=${AI_DATA_CATALOG_WAREHOUSE:-}"'
 require_text "init/configure-ai-data-catalog.sh" "DBMS_CATALOG.MOUNT_ICEBERG"
@@ -217,12 +219,15 @@ require_text "init/iceberg-seed.service" "--profile seed run --rm iceberg-seeder
 reject_text "init/iceberg-seed.service" "build iceberg-seeder"
 require_text "init/iceberg-seed.service" "create-iceberg-adb-external-table.sh"
 require_text "init/create-pg-iceberg-connection.sh" "DEFAULT_CONNECTION_NAME=\"pg-iceberg\""
+require_text "init/create-pg-iceberg-connection.sh" "DEFAULT_AICAT_CONNECTION_NAME=\"pg-aicat\""
 require_text "init/create-pg-iceberg-connection.sh" "build_adb_connection_payload"
+require_text "init/create-pg-iceberg-connection.sh" "build_aicat_connection_payload"
 require_text "init/create-pg-iceberg-connection.sh" 'properties["password"] = base64.b64encode('
 require_text "init/create-pg-iceberg-connection.sh" 'configure_adb_connection "${api_prefix}"'
 require_text "init/create-pg-iceberg-connection.sh" "import requests"
 require_text "init/create-pg-iceberg-connection.sh" "jobs/test_connection"
 require_text "init/create-pg-iceberg-connection.sh" '"enableCredentialVending": "true"'
+require_text "init/create-pg-iceberg-connection.sh" '"enableCredentialVending": "false"'
 require_text "init/create-pg-iceberg-connection.sh" '"s3AccessID": os.environ["S3_ACCESS_ID"]'
 require_text "init/create-pg-iceberg-connection.sh" '"s3Region": os.environ["S3_REGION"]'
 require_text "init/create-pg-iceberg-connection.sh" '"azureAccountKey": None'
