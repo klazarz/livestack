@@ -103,10 +103,20 @@ require_entry "ingestion/gravitino/Dockerfile"
 require_entry "ingestion/gravitino/entrypoint.sh"
 require_entry "ingestion/iceberg-seeder/Dockerfile"
 require_entry "ingestion/iceberg-seeder/seed_product_master.py"
+require_entry "ingestion/iceberg-seeder/seed_ai_catalog.py"
+require_entry "init/seed-ai-data-catalog.sh"
+require_entry "init/pg-ai-catalog-bronze.service"
+require_entry "tests/test-ai-catalog-bronze.py"
+for source in products store_inventory store_locations store_sales_transactions; do
+  require_entry "ingestion/demodata/aicat-sources/${source}.csv"
+done
 require_entry "init/create-pg-iceberg-connection.sh"
 require_entry "init/create-iceberg-adb-external-table.sh"
 require_entry "init/configure-ai-data-catalog.sh"
 require_entry "init/adb-wallet.sh"
+require_entry "ingestion/db/data/bootstrap_context.sql"
+require_entry "tests/test-bootstrap-vpd.cjs"
+require_entry "tests/test-bootstrap-vpd.sql"
 require_entry "init/pg-ai-data-catalog.service"
 require_entry "init/pg-iceberg-connection.service"
 require_entry "init/iceberg-seed.service"
@@ -143,6 +153,11 @@ reject_text "ingestion/frontend/src/pages/BronzeDataLoadGuide.jsx" "DEMAND_SIGNA
 reject_text "ingestion/frontend/src/pages/BronzeDataLoadGuide.jsx" "demand_signals_raw"
 
 echo "Checking deployment health-check configuration..."
+require_text "ingestion/db/data/load_all_data.sql" "@@bootstrap_context.sql"
+require_text "ingestion/db/data/load_all_data.sql" "WHENEVER SQLERROR EXIT SQL.SQLCODE ROLLBACK"
+require_text "ingestion/scripts/bootstrap_db.sh" 'db/data/bootstrap_context.sql'
+require_text "init/adb-load.sh" 'db/data/bootstrap_context.sql'
+require_text "ingestion/backend/routes/lakehouse.js" 'ADB readiness requires the active admin_jess seed user.'
 require_text "ingestion/compose.yml" "hostname: gravitino"
 reject_text "ingestion/compose.yml" "GRAVITINO_ICEBERG_REST_SERVER_ARCHIVE_URL:"
 require_text "ingestion/compose.yml" 'http://127.0.0.1:$${GRAVITINO_HTTP_PORT:-1525}/iceberg/v1/config'
