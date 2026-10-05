@@ -115,6 +115,12 @@ zip -qr "${TMP_ZIP}" . \
   -x './**/oradata/*'
 
 unzip -q "${TMP_ZIP}" -d "${TMP_STAGE}"
+# GNU sed accepts -i alone; macOS/BSD sed requires an explicit backup suffix.
+if sed --version >/dev/null 2>&1; then
+  SED_IN_PLACE=(-i)
+else
+  SED_IN_PLACE=(-i '')
+fi
 find "${TMP_STAGE}" -type f \
   \( -name '*.sh' \
      -o -name '*.service' \
@@ -122,7 +128,7 @@ find "${TMP_STAGE}" -type f \
      -o -name '*.yml' \
      -o -name '*.yaml' \
      -o -name '*.py' \) \
-  -exec sed -i 's/\r$//' {} +
+  -exec sed "${SED_IN_PLACE[@]}" $'s/\r$//' {} +
 rm -f "${TMP_ZIP}"
 (
   cd "${TMP_STAGE}"
