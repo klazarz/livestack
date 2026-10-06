@@ -865,8 +865,12 @@ payload = {
             ).decode("ascii"),
             "restUri": os.environ["AICAT_REST_URL"],
             "restUser": os.environ["AICAT_USERNAME"],
-            "s3AccessID": os.environ["S3_ACCESS_ID"],
-            "s3SecretKey": os.environ["S3_SECRET_KEY"],
+            "s3AccessID": base64.b64encode(
+                os.environ["S3_ACCESS_ID"].encode("utf-8")
+            ).decode("ascii"),
+            "s3SecretKey": base64.b64encode(
+                os.environ["S3_SECRET_KEY"].encode("utf-8")
+            ).decode("ascii"),
             "storageType": "OCIObjectStorage",
             "tokenUri": f'{os.environ["AICAT_REST_URL"]}/v1/auth/token',
             "warehouseName": os.environ["AICAT_WAREHOUSE_NAME"],

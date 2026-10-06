@@ -445,6 +445,7 @@ run_sql "${WORK_DIR}/admin.sql"
 PG_AI_ENABLED="${PG_AI_PROFILE_AUTO_SETUP:-true}"
 OCI_AUTH="${OCI_AUTH_TYPE:-api_key}"
 OCI_REGION_VALUE="${OCI_REGION:-${AI_ENDPOINT_REGION:-${REGION_IDENTIFIER:-}}}"
+OCI_GENAI_REGION_VALUE="${AI_ENDPOINT_REGION:-${OCI_REGION_VALUE}}"
 OCI_COMPARTMENT_VALUE="${OCI_COMPARTMENT_ID:-${COMPARTMENT_OCID:-}}"
 OCI_USER_VALUE="${OCI_USER_OCID:-${USER_OCID:-${user:-}}}"
 OCI_TENANCY_VALUE="${OCI_TENANCY_OCID:-${TENANCY_OCID:-${tenancy:-}}}"
@@ -453,6 +454,7 @@ OCI_PRIVATE_KEY_VALUE="${OCI_PRIVATE_KEY:-${PEM_SINGLE_LINE:-${PEM_KEY:-}}}"
 OCI_PRIVATE_KEY_VALUE="$(printf '%b' "${OCI_PRIVATE_KEY_VALUE}")"
 OCI_PROFILE_NAME="${OCI_AI_PROFILE_NAME:-PG_GENAI_PROFILE}"
 OCI_RETURN_AGENT_PROFILE_NAME="${WEBSHOP_RETURN_AGENT_PROFILE_NAME:-PG_RETURN_AGENT_PROFILE}"
+OCI_DATASTUDIO_PROFILE_NAME="DATASTUDIO_PROFILE"
 OCI_CREDENTIAL_NAME="${OCI_GENAI_CREDENTIAL_NAME:-PG_OCI_GENAI_CRED}"
 OCI_MODEL_VALUE="${OCI_GENAI_MODEL:-cohere.command-a-03-2025}"
 OCI_EMBEDDING_MODEL_VALUE="${OCI_GENAI_EMBEDDING_MODEL:-cohere.embed-v4.0}"
@@ -474,6 +476,7 @@ if is_enabled "${PG_AI_ENABLED}" && [[ "${OCI_AUTH,,}" == "api_key" ]]; then
   if [[ ${#missing[@]} -eq 0 ]]; then
     PROFILE_ATTRIBUTES="{\"provider\":\"oci\",\"credential_name\":\"${OCI_CREDENTIAL_NAME}\",\"comments\":true,\"oci_compartment_id\":\"${OCI_COMPARTMENT_VALUE}\",\"region\":\"${OCI_REGION_VALUE}\",\"model\":\"${OCI_MODEL_VALUE}\",\"embedding_model\":\"${OCI_EMBEDDING_MODEL_VALUE}\",\"oci_apiformat\":\"COHERE\",\"temperature\":0,\"object_list\":[{\"owner\":\"${APP_SCHEMA}\"}]}"
     RETURN_AGENT_PROFILE_ATTRIBUTES="{\"provider\":\"oci\",\"credential_name\":\"${OCI_CREDENTIAL_NAME}\",\"comments\":true,\"oci_compartment_id\":\"${OCI_COMPARTMENT_VALUE}\",\"region\":\"${OCI_REGION_VALUE}\",\"model\":\"${OCI_MODEL_VALUE}\",\"oci_apiformat\":\"COHERE\",\"temperature\":0,\"object_list\":[{\"owner\":\"${APP_SCHEMA}\",\"name\":\"DIM_PRODUCT\"},{\"owner\":\"${APP_SCHEMA}\",\"name\":\"PRODUCT_MANUALS_SOURCE\"},{\"owner\":\"${APP_SCHEMA}\",\"name\":\"CUSTOMER_ORDER_STATUS\"}]}"
+    DATASTUDIO_PROFILE_ATTRIBUTES="{\"provider\":\"oci\",\"credential_name\":\"${OCI_CREDENTIAL_NAME}\",\"model\":\"xai.grok-4.3\",\"object_list\":[{\"owner\":\"${APP_SCHEMA}\"}],\"oci_apiformat\":\"GENERIC\",\"oci_compartment_id\":\"${OCI_COMPARTMENT_VALUE}\",\"region\":\"${OCI_GENAI_REGION_VALUE}\",\"comments\":true,\"temperature\":0}"
     cat > "${WORK_DIR}/admin_ai.sql" <<SQL
 SET ECHO OFF
 SET DEFINE OFF
@@ -556,6 +559,7 @@ SQL
     PRIVATE_KEY_LITERAL="$(q_literal "${OCI_PRIVATE_KEY_VALUE}")"
     PROFILE_ATTRIBUTES_LITERAL="$(q_literal "${PROFILE_ATTRIBUTES}")"
     RETURN_AGENT_PROFILE_ATTRIBUTES_LITERAL="$(q_literal "${RETURN_AGENT_PROFILE_ATTRIBUTES}")"
+    DATASTUDIO_PROFILE_ATTRIBUTES_LITERAL="$(q_literal "${DATASTUDIO_PROFILE_ATTRIBUTES}")"
     PROFILE_SQL=$(cat <<SQL
 PROMPT Creating ${APP_SCHEMA} DBMS_CLOUD_AI profile...
 WHENEVER SQLERROR CONTINUE
@@ -609,6 +613,20 @@ BEGIN
   EXCEPTION
     WHEN OTHERS THEN NULL;
   END;
+END;
+/
+
+PROMPT Creating Data Studio DBMS_CLOUD_AI profile...
+BEGIN
+  BEGIN
+    DBMS_CLOUD_AI.DROP_PROFILE(profile_name => '$(sql_literal "${OCI_DATASTUDIO_PROFILE_NAME}")', force => TRUE);
+  EXCEPTION
+    WHEN OTHERS THEN NULL;
+  END;
+  DBMS_CLOUD_AI.CREATE_PROFILE(
+    profile_name => '$(sql_literal "${OCI_DATASTUDIO_PROFILE_NAME}")',
+    attributes   => ${DATASTUDIO_PROFILE_ATTRIBUTES_LITERAL}
+  );
 END;
 /
 
