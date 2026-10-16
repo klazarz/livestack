@@ -8,7 +8,9 @@
 
 ## PeakGear scenario and lakehouse paths
 
-The parent project presents reusable product and demand data across shopper/order, operations, preparation, and streaming workflows. Its general medallion description is:
+The parent project presents reusable product and demand data across shopper/order, operations, preparation, and streaming workflows. The intended Data Transforms design is one project named `peakgear`, with the medallion objects folded into it. The current bootstrap still provisions a separate `peakgear_medallion` project; reconcile the implementation against this target as tracked in [known gaps](known-gaps.md). The user did not specify a change to workflow execution behavior.
+
+The parent project's general medallion description is:
 
 - Bronze retains source-oriented data and traceability.
 - Silver cleans/enriches data for reuse.

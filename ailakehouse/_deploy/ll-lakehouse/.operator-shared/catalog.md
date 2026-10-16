@@ -33,5 +33,5 @@
   - Description: Authoritative documentation, source, and tests by engineering topic.
   - Read If: Looking for the source of truth or deciding where a behavior is implemented and tested.
 - `known-gaps.md`
-  - Description: Evidence-backed unresolved rationale and documentation/source conflicts.
-  - Read If: Interpreting inconsistent guides, making a decision with missing historical context, or updating documentation.
+  - Description: User-confirmed design rationale, unresolved deployment policy, and evidence-backed documentation/source conflicts.
+  - Read If: Changing behavior with recorded trade-offs, interpreting inconsistent guides, resolving known conflicts, or deciding what requires clarification.
